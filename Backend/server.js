@@ -16,8 +16,8 @@ const app = express(); // Create Express app instance
 
 // ✅ Enable CORS to allow frontend (React) to access backend
 app.use(cors({
-  origin: "http://localhost:3000",  // Allow requests from React app
-  credentials: true                 // Allow cookies/session sharing
+  origin: "http://localhost:5173",
+  credentials: true
 }));
 
 // ✅ Parse incoming JSON data from requests

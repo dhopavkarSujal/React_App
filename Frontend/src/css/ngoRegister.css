@@ -1,0 +1,203 @@
+/*-----------RESET---------------*/
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+}
+
+/*-----------BACKGROUND---------------*/
+.auth-wrapper {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9, #a5d6a7);
+  background-size: 400% 400%;
+  animation: gradientMove 12s ease infinite;
+  overflow: hidden;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.auth-wrapper::before {
+  content: "";
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: rgba(46, 125, 50, 0.08);
+  border-radius: 50%;
+  top: -150px;
+  right: -150px;
+  z-index: 0;
+}
+
+/*-----------CONTAINER---------------*/
+.authcontainer {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/*-----------FORM CARD---------------*/
+.ngo-form-box {
+  background: white;
+  padding: 45px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 750px;
+  margin: 0 auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeUp 0.6s ease;
+}
+
+.ngo-form-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/*-----------HEADING---------------*/
+.ngo-form-box h2 {
+  text-align: center;
+  font-size: 28px;
+  color: #1b5e20;
+  margin-bottom: 35px;
+  font-weight: 700;
+}
+
+.ngo-form-box h2::after {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 3px;
+  background: #2e7d32;
+  margin: 10px auto 0;
+  border-radius: 3px;
+}
+
+/*-----------GRID LAYOUT---------------*/
+.ngo-form-box form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 28px;
+}
+
+.ngo-form-box textarea,
+.ngo-form-box button[type="submit"],
+.ngo-form-box form p {
+  grid-column: span 2;
+}
+
+/*-----------INPUTS---------------*/
+.ngo-form-box input,
+.ngo-form-box textarea {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #d7e9da;
+  background-color: #f9fdf9;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.ngo-form-box input {
+  height: 44px;
+}
+
+.ngo-form-box input:hover,
+.ngo-form-box textarea:hover {
+  border-color: #81c784;
+}
+
+.ngo-form-box input:focus,
+.ngo-form-box textarea:focus {
+  border-color: #2e7d32;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+  background-color: #ffffff;
+  outline: none;
+}
+
+.ngo-form-box textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.ngo-form-box input:disabled,
+.ngo-form-box textarea:disabled {
+  background-color: #f1f1f1;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/*-----------PRIMARY BUTTON---------------*/
+.ngo-form-box button[type="submit"] {
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #2e7d32, #43a047);
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.ngo-form-box button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(46, 125, 50, 0.3);
+}
+
+.ngo-form-box button[type="submit"]:active {
+  transform: scale(0.98);
+}
+
+/*-----------LOGIN LINK---------------*/
+.ngo-form-box form p {
+  text-align: center;
+  margin-top: 10px;
+  color: #2e7d32;
+  font-size: 14px;
+}
+
+.ngo-form-box form p button {
+  background: none;
+  border: none;
+  color: #1b5e20;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ngo-form-box form p button:hover {
+  text-decoration: underline;
+}
+
+/*-----------RESPONSIVE---------------*/
+@media (max-width: 768px) {
+  .ngo-form-box {
+    padding: 30px;
+  }
+
+  .ngo-form-box form {
+    grid-template-columns: 1fr;
+  }
+
+  .ngo-form-box textarea,
+  .ngo-form-box button[type="submit"],
+  .ngo-form-box form p {
+    grid-column: span 1;
+  }
+}

@@ -1,0 +1,180 @@
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
+import StatsCards from "../components/StatsCards";
+import DonationsPage from "../pages/Donations";
+import RecentDonations from "../components/RecentDonations";
+import NotificationModal from "../components/NotificationModal";
+import Ngos from "./Ngos";
+import AddDonationModal from "../components/AddDonationModal";
+import Profile from "./Profile";
+
+import "../css/dashboard.css";
+import "../css/profile.css";
+
+const DashboardHome = ({ donations }) => (
+  <>
+    <StatsCards donations={donations} />
+    <RecentDonations donations={donations} />
+  </>
+);
+
+const Dashboard = () => {
+  const navigate = useNavigate(); 
+  const [activePage, setActivePage] = useState("dashboard");
+  const [showModal, setShowModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [showNotif, setShowNotif] = useState(false);
+  const [user, setUser] = useState(null);
+  const [donations, setDonations] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+useEffect(() => {
+  fetch("http://localhost:5000/api/auth/check", {
+    credentials: "include",
+  })
+    .then((res) => {
+      if (!res.ok) {
+        navigate("/login");
+        return;
+      }
+      return res.json();
+    })
+    .then((data) => {
+      if (data.user) {
+        setUser(data.user);
+      }
+    })
+    .catch(() => navigate("/login"));
+}, [navigate]);
+
+  useEffect(() => {
+  const fetchNotifications = () => {
+    fetch("http://localhost:5000/api/auth/notifications", {
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(data => setNotifications(data))
+      .catch(err => console.error(err));
+  };
+
+  fetchNotifications();
+
+  const interval = setInterval(fetchNotifications, 5000); // every 5 sec
+
+  return () => clearInterval(interval);
+}, []);
+
+  useEffect(() => {
+  fetch("http://localhost:5000/api/donations/my", {
+    credentials: "include",
+  })
+    .then(res => res.json())
+    .then(data => setDonations(data))
+    .catch(err => console.error(err));
+}, []);
+  /* ----------- Dark Mode ----------- */
+  useEffect(() => {
+    document.body.classList.toggle("dark", darkMode);
+  }, [darkMode]);
+
+  /* ----------- Sidebar Open Class ----------- */
+  useEffect(() => {
+    document.body.classList.toggle("sidebar-open", sidebarOpen);
+    return () => {
+      document.body.classList.remove("sidebar-open");
+    };
+  }, [sidebarOpen]);
+
+  /* ----------- Swipe to Open Sidebar ----------- */
+  useEffect(() => {
+    let startX = 0;
+
+    const handleTouchStart = (e) => {
+      startX = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = (e) => {
+      const endX = e.changedTouches[0].clientX;
+      if (startX < 50 && endX > 120) {
+        setSidebarOpen(true);
+      }
+    };
+
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, []);
+
+  /* ----------- Page Renderer ----------- */
+  const renderPage = () => {
+    switch (activePage) {
+      case "donations":
+        return <DonationsPage />;
+      case "ngos":
+        return <Ngos />;
+      case "profile":
+        return <Profile />;
+      default:
+        return <DashboardHome donations={donations} />;
+    }
+  };
+
+  return (
+    <>
+      <Sidebar
+        activePage={activePage}
+        setActivePage={setActivePage}
+        sidebarOpen={sidebarOpen}
+        closeSidebar={() => setSidebarOpen(false)}
+      />
+
+      <Header
+        username={user?.name}
+        onAddDonation={() => setShowModal(true)}
+        toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        toggleTheme={() => setDarkMode(!darkMode)}
+        darkMode={darkMode}
+        openNotifications={() => setShowNotif(true)}
+        notifCount={notifications.length}
+      />
+      <main className="dashboard-body">
+        {renderPage()}
+      </main>
+
+      {showModal && (
+        <AddDonationModal 
+          onClose={() => {
+            setShowModal(false);
+            fetch("/api/donations/my", {
+              credentials: "include",
+            })
+              .then(res => res.json())
+              .then(data => setDonations(data));
+          }} 
+        />
+      )}
+
+      {showNotif && (
+        <NotificationModal
+          onClose={() => setShowNotif(false)}
+          notifications={notifications}
+        />
+      )}
+
+      {sidebarOpen && (
+        <div
+          className="overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+    </>
+  );
+};
+
+export default Dashboard;
