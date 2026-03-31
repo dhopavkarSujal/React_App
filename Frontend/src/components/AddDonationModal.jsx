@@ -9,30 +9,39 @@ const AddDonationModal = ({ onClose }) => {
   const [description, setDescription] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // ✅ NEW
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     // ✅ VALIDATION
-    if (!donationType) return setError("Please select donation type.");
+    if (!donationType) {
+      setLoading(false);
+      return setError("Please select donation type.");
+    }
 
     if (donationType === "Food") {
       if (!quantity || !expiryDate) {
+        setLoading(false);
         return setError("Food quantity and expiry date required.");
       }
 
       const today = new Date().toISOString().split("T")[0];
       if (expiryDate <= today) {
+        setLoading(false);
         return setError("Food expiry must be future date.");
       }
     }
 
     if (donationType === "Funds" && !amount) {
+      setLoading(false);
       return setError("Amount is required.");
     }
 
     if (!description.trim()) {
+      setLoading(false);
       return setError("Description is required.");
     }
 
@@ -40,7 +49,10 @@ const AddDonationModal = ({ onClose }) => {
       `Confirm Donation?\n\nType: ${donationType}\nDescription: ${description}`
     );
 
-    if (!confirmSubmit) return;
+    if (!confirmSubmit) {
+      setLoading(false);
+      return;
+    }
 
     try {
       // 🔐 Get logged-in user
@@ -48,8 +60,8 @@ const AddDonationModal = ({ onClose }) => {
       const user = sessionData.session?.user;
 
       if (!user) {
-        setError("User not logged in");
-        return;
+        setLoading(false);
+        return setError("User not logged in");
       }
 
       // ✅ INSERT INTO SUPABASE
@@ -67,9 +79,7 @@ const AddDonationModal = ({ onClose }) => {
           },
         ]);
 
-      if (insertError) {
-        throw new Error(insertError.message);
-      }
+      if (insertError) throw insertError;
 
       alert("Donation submitted successfully! 🎉");
 
@@ -83,7 +93,10 @@ const AddDonationModal = ({ onClose }) => {
       onClose();
 
     } catch (err) {
+      console.error(err);
       setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -159,13 +172,13 @@ const AddDonationModal = ({ onClose }) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Write a short note..."
-            ></textarea>
+            />
           </div>
 
           {error && <p className="error-msg">{error}</p>}
 
-          <button type="submit" className="btn-submit">
-            Add Donation
+          <button type="submit" className="btn-submit" disabled={loading}>
+            {loading ? "Submitting..." : "Add Donation"}
           </button>
         </form>
       </div>

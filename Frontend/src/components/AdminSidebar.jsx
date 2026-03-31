@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../config/supabaseClient";
 
 const AdminSidebar = ({ activePage, setActivePage }) => {
   const navigate = useNavigate();
@@ -7,11 +8,13 @@ const AdminSidebar = ({ activePage, setActivePage }) => {
     setActivePage(page);
   };
 
+  // 🔐 SUPABASE LOGOUT
   const handleLogout = async () => {
-    await fetch("https://serveshare-64pl.onrender.com/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error(error);
+    }
 
     navigate("/login");
   };
@@ -21,7 +24,7 @@ const AdminSidebar = ({ activePage, setActivePage }) => {
       <h2>ServeShare</h2>
 
       <ul>
-        {/* Pending Donations */}
+        {/* Dashboard */}
         <li>
           <button
             className={`sidebar-link ${activePage === "donations" ? "active" : ""}`}

@@ -1,13 +1,15 @@
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../config/supabaseClient";
 
 const AdminHeader = ({ user }) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await fetch("https://serveshare-64pl.onrender.com/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error(error);
+    }
 
     navigate("/login");
   };
@@ -15,7 +17,7 @@ const AdminHeader = ({ user }) => {
   return (
     <header className="dashboard-header">
       <div>
-        <h3>Welcome, {user?.name}</h3>
+        <h3>Welcome, {user?.name || "Admin"}</h3>
         <p>Admin Panel</p>
       </div>
 

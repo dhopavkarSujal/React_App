@@ -27,23 +27,24 @@ function Register() {
         return;
       }
 
-      // ⚠️ Important fix (handles both cases)
       const user = data.user || data.session?.user;
 
       if (!user) {
-        alert("User created but session not found. Check email confirmation.");
+        alert("Check your email for confirmation.");
         return;
       }
 
-      // 📦 Insert extra user data in your table
-      const { error: dbError } = await supabase.from("users").insert([
-        {
-          id: user.id,
-          name: name,
-          email: email,
-          role: "user",
-        },
-      ]);
+      // 📦 Insert into users table
+      const { error: dbError } = await supabase
+        .from("users")
+        .insert([
+          {
+            id: user.id,
+            name: name,
+            email: email,
+            role: "user",
+          },
+        ]);
 
       if (dbError) {
         console.error(dbError);
@@ -54,8 +55,8 @@ function Register() {
       alert("Registration successful 🎉");
       navigate("/login");
 
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
       alert("Registration failed");
     } finally {
       setLoading(false);
@@ -66,48 +67,67 @@ function Register() {
     <div className="auth-wrapper">
       <div className="auth-container">
 
+        {/* LEFT */}
         <div className="left-section">
-          <h1>Join ServeShare</h1>
+          <div>
+            <h1>Join ServeShare</h1>
+            <p>Create your account and start helping people today!</p>
+          </div>
         </div>
 
+        {/* RIGHT */}
         <div className="right-section">
           <div className="form-box">
-            <h2>Register</h2>
+            <h2>Create Account</h2>
 
             <form onSubmit={handleRegister}>
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
+              <div className="form-group">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  placeholder="Enter Full Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
 
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  placeholder="Enter Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
 
-              <input
-                type="password"
-                placeholder="Password"
-                value={pass}
-                onChange={(e) => setPass(e.target.value)}
-                required
-              />
+              <div className="form-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter Password"
+                  value={pass}
+                  onChange={(e) => setPass(e.target.value)}
+                  required
+                />
+              </div>
 
-              <button type="submit" disabled={loading}>
-                {loading ? "Creating..." : "Register"}
+              <button type="submit" className="btn" disabled={loading}>
+                {loading ? "Creating Account..." : "Register"}
               </button>
             </form>
 
-            <p>
-              Already have an account?
-              <span onClick={() => navigate("/login")}> Login</span>
-            </p>
+            <div className="auth-footer">
+              <p>
+                Already have an account?
+                <span onClick={() => navigate("/login")}>
+                  {" "}Login
+                </span>
+              </p>
+            </div>
+
           </div>
         </div>
       </div>

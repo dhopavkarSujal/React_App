@@ -25,6 +25,7 @@ function AdminDashboard() {
         return;
       }
 
+      // 📦 Get user role
       const { data: profile } = await supabase
         .from("users")
         .select("*")
@@ -38,20 +39,24 @@ function AdminDashboard() {
 
       setUser(profile);
 
-      // 📦 FETCH PENDING DONATIONS
-      const { data: pendingDonations } = await supabase
+      // 📦 Fetch pending donations
+      const { data: pending } = await supabase
         .from("donations")
         .select("*")
-        .eq("status", "pending");
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
 
-      setDonations(pendingDonations || []);
+      setDonations(pending || []);
     };
 
     checkAdmin();
   }, [navigate]);
 
-  // ✅ APPROVE DONATION
+  // ✅ APPROVE
   const handleApprove = async (id) => {
+    const confirm = window.confirm("Approve this donation?");
+    if (!confirm) return;
+
     const { error } = await supabase
       .from("donations")
       .update({ status: "approved" })
@@ -62,8 +67,11 @@ function AdminDashboard() {
     }
   };
 
-  // ❌ REJECT DONATION
+  // ❌ REJECT
   const handleReject = async (id) => {
+    const confirm = window.confirm("Reject this donation?");
+    if (!confirm) return;
+
     const { error } = await supabase
       .from("donations")
       .update({ status: "rejected" })
