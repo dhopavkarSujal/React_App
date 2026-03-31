@@ -35,7 +35,7 @@ const Dashboard = () => {
   const [donations, setDonations] = useState([]);
   const [notifications, setNotifications] = useState([]);
 
-  // 🔐 CHECK USER SESSION
+  // 🔐 AUTH CHECK
   useEffect(() => {
     const checkUser = async () => {
       const { data } = await supabase.auth.getSession();
@@ -59,53 +59,51 @@ const Dashboard = () => {
   }, [navigate]);
 
   // 📦 FETCH DONATIONS
-  const fetchDonations = async (userId) => {
-    if (!userId) return;
+  const fetchDonations = async () => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const currentUser = sessionData.session?.user;
 
-    const { data, error } = await supabase
+    if (!currentUser) return;
+
+    const { data } = await supabase
       .from("donations")
       .select("*")
-      .eq("user_id", userId);
+      .eq("user_id", currentUser.id)
+      .order("created_at", { ascending: false });
 
-    if (!error) {
-      setDonations(data);
-    }
+    setDonations(data || []);
   };
+
+  useEffect(() => {
+    fetchDonations();
+  }, []);
 
   // 🔔 FETCH NOTIFICATIONS
-  const fetchNotifications = async (userId) => {
-    if (!userId) return;
-
-    const { data, error } = await supabase
-      .from("notifications")
-      .select("*")
-      .eq("user_id", userId);
-
-    if (!error) {
-      setNotifications(data);
-    }
-  };
-
-  // 🔁 LOAD DATA AFTER USER
   useEffect(() => {
-    if (user?.id) {
-      fetchDonations(user.id);
-      fetchNotifications(user.id);
+    const fetchNotifications = async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const currentUser = sessionData.session?.user;
 
-      const interval = setInterval(() => {
-        fetchNotifications(user.id);
-      }, 5000);
+      if (!currentUser) return;
 
-      return () => clearInterval(interval);
-    }
-  }, [user]);
+      const { data } = await supabase
+        .from("notifications")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .order("created_at", { ascending: false });
+
+      setNotifications(data || []);
+    };
+
+    fetchNotifications();
+  }, []);
 
   // 🌙 DARK MODE
   useEffect(() => {
     document.body.classList.toggle("dark", darkMode);
   }, [darkMode]);
 
-  // 📱 SIDEBAR
+  // 📱 SIDEBAR CLASS
   useEffect(() => {
     document.body.classList.toggle("sidebar-open", sidebarOpen);
     return () => {
@@ -113,31 +111,7 @@ const Dashboard = () => {
     };
   }, [sidebarOpen]);
 
-  // 👉 SWIPE SIDEBAR
-  useEffect(() => {
-    let startX = 0;
-
-    const handleTouchStart = (e) => {
-      startX = e.touches[0].clientX;
-    };
-
-    const handleTouchEnd = (e) => {
-      const endX = e.changedTouches[0].clientX;
-      if (startX < 50 && endX > 120) {
-        setSidebarOpen(true);
-      }
-    };
-
-    window.addEventListener("touchstart", handleTouchStart);
-    window.addEventListener("touchend", handleTouchEnd);
-
-    return () => {
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, []);
-
-  // 📄 PAGE SWITCH
+  // 👉 PAGE SWITCH
   const renderPage = () => {
     switch (activePage) {
       case "donations":
@@ -179,7 +153,7 @@ const Dashboard = () => {
         <AddDonationModal
           onClose={() => {
             setShowModal(false);
-            fetchDonations(user?.id);
+            fetchDonations(); // ✅ FIXED
           }}
         />
       )}
