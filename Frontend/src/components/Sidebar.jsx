@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../config/supabaseClient";
 
 const Sidebar = ({ activePage, setActivePage, sidebarOpen, closeSidebar }) => {
   const navigate = useNavigate();
@@ -8,11 +9,13 @@ const Sidebar = ({ activePage, setActivePage, sidebarOpen, closeSidebar }) => {
     closeSidebar();
   };
 
+  // 🔐 SUPABASE LOGOUT
   const handleLogout = async () => {
-    await fetch("https://serveshare-64pl.onrender.com/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error(error);
+    }
 
     navigate("/login");
   };

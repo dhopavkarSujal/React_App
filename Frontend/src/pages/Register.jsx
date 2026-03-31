@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../config/supabaseClient";
 import "../css/login-register.css";
 
 function Register() {
@@ -15,28 +16,47 @@ function Register() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          email,
-          password: pass,
-        }),
+      // 🔐 Create user in Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password: pass,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.message || "Registration failed");
+      if (error) {
+        alert(error.message);
         return;
       }
 
-      alert("Registration successful");
+      // ⚠️ Important fix (handles both cases)
+      const user = data.user || data.session?.user;
+
+      if (!user) {
+        alert("User created but session not found. Check email confirmation.");
+        return;
+      }
+
+      // 📦 Insert extra user data in your table
+      const { error: dbError } = await supabase.from("users").insert([
+        {
+          id: user.id,
+          name: name,
+          email: email,
+          role: "user",
+        },
+      ]);
+
+      if (dbError) {
+        console.error(dbError);
+        alert("User created but profile not saved.");
+        return;
+      }
+
+      alert("Registration successful 🎉");
       navigate("/login");
-    } catch (error) {
-      console.error(error);
-      alert("Server error. Try again later.");
+
+    } catch (err) {
+      console.error(err);
+      alert("Registration failed");
     } finally {
       setLoading(false);
     }
@@ -45,67 +65,49 @@ function Register() {
   return (
     <div className="auth-wrapper">
       <div className="auth-container">
-        {/* LEFT */}
+
         <div className="left-section">
-          <div>
-            <h1>Join ServeShare</h1>
-            <p>Create your account and start helping people today!</p>
-          </div>
+          <h1>Join ServeShare</h1>
         </div>
 
-        {/* RIGHT */}
         <div className="right-section">
           <div className="form-box">
-            <h2>Create Account</h2>
+            <h2>Register</h2>
 
             <form onSubmit={handleRegister}>
-              <div className="form-group">
-                <label>Full Name</label>
-                <input
-                  type="text"
-                  placeholder="Enter Full Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  autoComplete="name"
-                />
-              </div>
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
 
-              <div className="form-group">
-                <label>Email</label>
-                <input
-                  type="email"
-                  placeholder="Enter Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                />
-              </div>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
 
-              <div className="form-group">
-                <label>Password</label>
-                <input
-                  type="password"
-                  placeholder="Enter Password"
-                  value={pass}
-                  onChange={(e) => setPass(e.target.value)}
-                  required
-                  autoComplete="new-password"
-                />
-              </div>
+              <input
+                type="password"
+                placeholder="Password"
+                value={pass}
+                onChange={(e) => setPass(e.target.value)}
+                required
+              />
 
-              <button type="submit" className="btn" disabled={loading}>
-                {loading ? "Creating Account..." : "Register"}
+              <button type="submit" disabled={loading}>
+                {loading ? "Creating..." : "Register"}
               </button>
             </form>
 
-            <div className="auth-footer">
-              <p>
-                Already have an account?
-                <span onClick={() => navigate("/login")}> Login</span>
-              </p>
-            </div>
+            <p>
+              Already have an account?
+              <span onClick={() => navigate("/login")}> Login</span>
+            </p>
           </div>
         </div>
       </div>

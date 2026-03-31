@@ -1,15 +1,39 @@
 import { useEffect, useState } from "react";
+import { supabase } from "../config/supabaseClient";
 
 const Donations = () => {
   const [donations, setDonations] = useState([]);
 
+  const fetchDonations = async () => {
+    // 🔐 Get logged-in user
+    const { data: sessionData } = await supabase.auth.getSession();
+    const user = sessionData.session?.user;
+
+    if (!user) {
+      console.log("No user found");
+      return;
+    }
+
+    // 📦 Fetch user donations
+    const { data, error } = await supabase
+      .from("donations")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false }); // 🔥 newest first
+
+    if (error) {
+      console.error(error);
+    } else {
+      setDonations(data || []);
+    }
+  };
+
   useEffect(() => {
-    fetch("http://localhost:5000/api/donations/my", {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => setDonations(data))
-      .catch((err) => console.error(err));
+    fetchDonations();
+
+    // 🔄 OPTIONAL: Auto refresh every 5 sec
+    const interval = setInterval(fetchDonations, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   return (

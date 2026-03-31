@@ -1,30 +1,65 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../config/supabaseClient";
 import "../css/ngoLogin.css";
 
 function NgoLogin() {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
+
+  // 🔄 Auto redirect if already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        navigate("/ngo-dashboard");
+      }
+    };
+    checkSession();
+  }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    const res = await fetch("http://localhost:5000/api/auth/ngo-login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ email, password: pass }),
-    });
+    try {
+      // 🔐 Supabase login
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password: pass,
+      });
 
-    const data = await res.json();
+      if (error) {
+        alert(error.message);
+        return;
+      }
 
-    if (!res.ok) {
-      alert(data.message);
-      return;
+      const user = data.user;
+
+      // 📦 Check role in DB
+      const { data: profile, error: profileError } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError || profile?.role !== "ngo") {
+        alert("Access denied: Not an NGO account");
+        return;
+      }
+
+      // ✅ Redirect
+      navigate("/ngo-dashboard");
+
+    } catch (err) {
+      console.error(err);
+      alert("Login failed");
+    } finally {
+      setLoading(false);
     }
-
-    navigate("/ngo-dashboard");
   };
 
   return (
@@ -53,7 +88,9 @@ function NgoLogin() {
             />
           </div>
 
-          <button type="submit">Login</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
 
           <p>
             Don’t have an account?

@@ -1,62 +1,104 @@
 import { useState, useEffect } from "react";
+import { supabase } from "../config/supabaseClient";
 import "../css/profile.css";
 
 const Profile = () => {
-  const userId = 1; // Later replace with JWT
-
   const [user, setUser] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [preview, setPreview] = useState(null);
-  const [image, setImage] = useState(null); // ✅ YOU MISSED THIS
+  const [image, setImage] = useState(null);
+  const [userId, setUserId] = useState(null);
 
+  // 🔐 GET LOGGED-IN USER
   useEffect(() => {
-    fetch(`http://localhost:5000/api/profile/${userId}`)
-      .then(res => res.json())
-      .then(data => setUser(data));
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      const currentUser = data.session?.user;
+
+      if (!currentUser) return;
+
+      setUserId(currentUser.id);
+
+      const { data: profile, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
+
+      if (!error) {
+        setUser(profile);
+      }
+    };
+
+    fetchUser();
   }, []);
 
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
+  // 💾 SAVE PROFILE
   const handleSave = async () => {
-    const formData = new FormData();
+    try {
+      let imageUrl = user.profile_image;
 
-    for (let key in user) {
-      formData.append(key, user[key]);
-    }
+      // 📤 Upload image to Supabase Storage
+      if (image) {
+        const fileName = `${userId}_${Date.now()}`;
 
-    if (image) {
-      formData.append("profile_image", image);
-    }
+        const { error: uploadError } = await supabase.storage
+          .from("profiles")
+          .upload(fileName, image);
 
-    const res = await fetch(`http://localhost:5000/api/profile/${userId}`, {
-        method: "PUT",
-        body: formData,
-      });
+        if (uploadError) throw uploadError;
 
-      const updatedUser = await res.json();
-      setUser(updatedUser);
+        const { data } = supabase.storage
+          .from("profiles")
+          .getPublicUrl(fileName);
+
+        imageUrl = data.publicUrl;
+      }
+
+      // 📦 Update user table
+      const { error } = await supabase
+        .from("users")
+        .update({
+          name: user.name,
+          phone: user.phone,
+          address: user.address,
+          city: user.city,
+          state: user.state,
+          pincode: user.pincode,
+          profile_image: imageUrl,
+        })
+        .eq("id", userId);
+
+      if (error) throw error;
+
+      alert("Profile Updated!");
+
+      setUser({ ...user, profile_image: imageUrl });
       setPreview(null);
       setIsEditing(false);
 
-    alert("Profile Updated!");
-    setIsEditing(false);
-    setPreview(null); // optional cleanup
+    } catch (err) {
+      console.error(err);
+      alert("Update failed");
+    }
   };
 
   return (
     <div className="profile-wrapper">
       <div className="profile-card">
 
+        {/* LEFT */}
         <div className="profile-left">
           <img
             src={
               preview
                 ? preview
-                : user.profile_image
-                ? `http://localhost:5000/uploads/${user.profile_image}?t=${Date.now()}`
-                : "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                : user.profile_image ||
+                  "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
             }
             alt="avatar"
             className="profile-img"
@@ -77,6 +119,7 @@ const Profile = () => {
           )}
         </div>
 
+        {/* RIGHT */}
         <div className="profile-right">
           <input
             name="name"
@@ -136,6 +179,7 @@ const Profile = () => {
             </button>
           )}
         </div>
+
       </div>
     </div>
   );

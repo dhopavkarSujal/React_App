@@ -1,74 +1,189 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { supabase } from "../config/supabaseClient";
+import "../css/addDonationModal.css";
 
-const RecentDonations = () => {
-  const [donations, setDonations] = useState([]);
+const AddDonationModal = ({ onClose }) => {
+  const [donationType, setDonationType] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // ✅ NEW
 
-  useEffect(() => {
-    fetchRecentDonations();
-  }, []);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true); // ✅ NEW
 
-  const fetchRecentDonations = async () => {
+    // ✅ VALIDATION
+    if (!donationType) {
+      setLoading(false);
+      return setError("Please select donation type.");
+    }
+
+    if (donationType === "Food") {
+      if (!quantity || !expiryDate) {
+        setLoading(false);
+        return setError("Food quantity and expiry date required.");
+      }
+
+      const today = new Date().toISOString().split("T")[0];
+      if (expiryDate <= today) {
+        setLoading(false);
+        return setError("Food expiry must be future date.");
+      }
+    }
+
+    if (donationType === "Funds" && !amount) {
+      setLoading(false);
+      return setError("Amount is required.");
+    }
+
+    if (!description.trim()) {
+      setLoading(false);
+      return setError("Description is required.");
+    }
+
+    const confirmSubmit = window.confirm(
+      `Confirm Donation?\n\nType: ${donationType}\nDescription: ${description}`
+    );
+
+    if (!confirmSubmit) {
+      setLoading(false);
+      return;
+    }
+
     try {
-      const res = await fetch("https://serveshare-64pl.onrender.com/api/donations/my", {
-        credentials: "include", // 🔥 Important
-      });
+      // 🔐 Get logged-in user
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData.session?.user;
 
-      const data = await res.json();
+      if (!user) {
+        setLoading(false);
+        return setError("User not logged in");
+      }
 
-      // Sort newest first (if not already sorted)
-      const sorted = data.sort(
-        (a, b) => new Date(b.created_at) - new Date(a.created_at)
-      );
+      // ✅ INSERT INTO SUPABASE
+      const { error: insertError } = await supabase
+        .from("donations")
+        .insert([
+          {
+            user_id: user.id,
+            donation_type: donationType,
+            quantity: quantity || null,
+            amount: amount || null,
+            description,
+            expiry_date: expiryDate || null,
+            status: "pending",
+          },
+        ]);
 
-      // Take only first 5
-      setDonations(sorted.slice(0, 5));
+      if (insertError) throw insertError;
+
+      alert("Donation submitted successfully! 🎉");
+
+      // 🔄 RESET FORM
+      setDonationType("");
+      setQuantity("");
+      setAmount("");
+      setDescription("");
+      setExpiryDate("");
+
+      onClose();
 
     } catch (err) {
-      console.error(err);
+      console.error(err); // ✅ NEW
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false); // ✅ NEW
     }
   };
 
   return (
-    <main className="donations-section">
-      <h2>Recent Donations</h2>
+    <div className="modal-overlay" onClick={onClose}>
+      <div
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <span className="close-btn" onClick={onClose}>
+          &times;
+        </span>
 
-      <div className="table-wrapper">
-        <table className="donation-table">
-          <thead>
-            <tr>
-              <th>Sr. No.</th>
-              <th>Donation Type</th>
-              <th>Quantity</th>
-              <th>Amount</th>
-              <th>Status</th>
-            </tr>
-          </thead>
+        <h2 className="modal-title">Add Donation</h2>
+        <p className="modal-subtitle">
+          Select type and fill required details
+        </p>
 
-          <tbody>
-            {donations.length === 0 ? (
-              <tr>
-                <td colSpan="5">No recent donations</td>
-              </tr>
-            ) : (
-              donations.map((donation, index) => (
-                <tr key={donation.id}>
-                  <td>{index + 1}</td>
-                  <td>{donation.donation_type}</td>
-                  <td>{donation.quantity || "—"}</td>
-                  <td>{donation.amount || "—"}</td>
-                  <td>
-                    <span className={`status ${donation.status}`}>
-                      {donation.status}
-                    </span>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Donation Type</label>
+            <select
+              value={donationType}
+              onChange={(e) => setDonationType(e.target.value)}
+              required
+            >
+              <option value="" disabled>Select Type</option>
+              <option value="Food">Food</option>
+              <option value="Clothes">Clothes</option>
+              <option value="Books">Books & Stationery</option>
+              <option value="Funds">Funds</option>
+            </select>
+          </div>
+
+          {donationType === "Food" && (
+            <>
+              <div className="form-group">
+                <label>Food Quantity</label>
+                <input
+                  type="text"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  placeholder="Eg: 10 meals"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Expiry Date</label>
+                <input
+                  type="date"
+                  value={expiryDate}
+                  onChange={(e) => setExpiryDate(e.target.value)}
+                />
+              </div>
+            </>
+          )}
+
+          {donationType === "Funds" && (
+            <div className="form-group">
+              <label>Amount</label>
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="Enter amount"
+              />
+            </div>
+          )}
+
+          <div className="form-group">
+            <label>Description</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Write a short note..."
+            />
+          </div>
+
+          {error && <p className="error-msg">{error}</p>}
+
+          <button type="submit" className="btn-submit" disabled={loading}>
+            {loading ? "Submitting..." : "Add Donation"} {/* ✅ NEW */}
+          </button>
+        </form>
       </div>
-    </main>
+    </div>
   );
 };
 
-export default RecentDonations;
+export default AddDonationModal;

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from "../config/supabaseClient";
 import "../css/addDonationModal.css";
 
 const AddDonationModal = ({ onClose }) => {
@@ -9,76 +10,82 @@ const AddDonationModal = ({ onClose }) => {
   const [expiryDate, setExpiryDate] = useState("");
   const [error, setError] = useState("");
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
+    // ✅ VALIDATION
+    if (!donationType) return setError("Please select donation type.");
 
-  if (!donationType) {
-    return setError("Please select donation type.");
-  }
+    if (donationType === "Food") {
+      if (!quantity || !expiryDate) {
+        return setError("Food quantity and expiry date required.");
+      }
 
-  if (donationType === "Food") {
-    if (!quantity || !expiryDate) {
-      return setError("Food quantity and expiry date required.");
+      const today = new Date().toISOString().split("T")[0];
+      if (expiryDate <= today) {
+        return setError("Food expiry must be future date.");
+      }
     }
 
-    const today = new Date().toISOString().split("T")[0];
-
-    if (expiryDate <= today) {
-      return setError("Food expiry must be future date.");
-    }
-  }
-
-  if (donationType === "Funds" && !amount) {
-    return setError("Amount is required.");
-  }
-
-  if (!description.trim()) {
-    return setError("Description is required.");
-  }
-
-  const confirmSubmit = window.confirm(
-    `Confirm Donation?\n\nType: ${donationType}\nDescription: ${description}`
-  );
-
-  if (!confirmSubmit) return;
-
-  try {
-    const response = await fetch("https://serveshare-64pl.onrender.com/api/donations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        donationType,
-        quantity,
-        amount,
-        description,
-        expiryDate,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Something went wrong");
+    if (donationType === "Funds" && !amount) {
+      return setError("Amount is required.");
     }
 
-    alert("Donation submitted successfully!");
+    if (!description.trim()) {
+      return setError("Description is required.");
+    }
 
-    // Reset form
-    setDonationType("");
-    setQuantity("");
-    setAmount("");
-    setDescription("");
-    setExpiryDate("");
+    const confirmSubmit = window.confirm(
+      `Confirm Donation?\n\nType: ${donationType}\nDescription: ${description}`
+    );
 
-    onClose();
+    if (!confirmSubmit) return;
 
-  } catch (err) {
-    setError(err.message || "Server error. Try again.");
-  }
-};
+    try {
+      // 🔐 Get logged-in user
+      const { data: sessionData } = await supabase.auth.getSession();
+      const user = sessionData.session?.user;
+
+      if (!user) {
+        setError("User not logged in");
+        return;
+      }
+
+      // ✅ INSERT INTO SUPABASE
+      const { error: insertError } = await supabase
+        .from("donations")
+        .insert([
+          {
+            user_id: user.id,
+            donation_type: donationType,
+            quantity: quantity || null,
+            amount: amount || null,
+            description,
+            expiry_date: expiryDate || null,
+            status: "pending",
+          },
+        ]);
+
+      if (insertError) {
+        throw new Error(insertError.message);
+      }
+
+      alert("Donation submitted successfully! 🎉");
+
+      // 🔄 RESET FORM
+      setDonationType("");
+      setQuantity("");
+      setAmount("");
+      setDescription("");
+      setExpiryDate("");
+
+      onClose();
+
+    } catch (err) {
+      setError(err.message || "Something went wrong");
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -103,9 +110,7 @@ const handleSubmit = async (e) => {
               onChange={(e) => setDonationType(e.target.value)}
               required
             >
-              <option value="" disabled>
-                Select Type
-              </option>
+              <option value="" disabled>Select Type</option>
               <option value="Food">Food</option>
               <option value="Clothes">Clothes</option>
               <option value="Books">Books & Stationery</option>

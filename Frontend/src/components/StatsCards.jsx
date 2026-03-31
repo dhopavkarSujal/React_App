@@ -1,11 +1,21 @@
 import { FaBox, FaClock, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
-function StatsCards({ donations }) {
+function StatsCards({ donations = [] }) {
 
-const total = donations.length;
-const pending = donations.filter(d => d.status === "pending").length;
-const approved = donations.filter(d => d.status === "approved").length;
-const rejected = donations.filter(d => d.status === "rejected").length;
+  // ✅ Safe fallback
+  const total = donations.length;
+
+  const pending = donations.filter(
+    (d) => d.status === "pending"
+  ).length;
+
+  const approved = donations.filter(
+    (d) => d.status === "approved"
+  ).length;
+
+  const rejected = donations.filter(
+    (d) => d.status === "rejected"
+  ).length;
 
   return (
     <div className="stats-container">

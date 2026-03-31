@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../config/supabaseClient";
 import "../css/login-register.css";
 
 function Login() {
@@ -9,49 +10,69 @@ function Login() {
 
   const navigate = useNavigate();
 
-const handleLogin = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+  // 🔥 Auto login if already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        navigate("/dashboard");
+      }
+    };
+    checkSession();
+  }, [navigate]);
 
-  try {
-    const res = await fetch("http://localhost:5000/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        email,
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // 🔐 Supabase login (same logic as your backend)
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
         password: pass,
-      }),
-    });
+      });
 
-    const data = await res.json();
+      if (error) {
+        alert(error.message || "Login failed");
+        return;
+      }
 
-    if (!res.ok) {
-      alert(data.message || "Login failed");
-      return;
+      const user = data.user;
+
+      // 📦 Fetch role from database (same as backend role logic)
+      const { data: profile, error: profileError } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError) {
+        console.log("Role not found, default user");
+      }
+
+      const role = profile?.role;
+
+      // 🔥 SAME REDIRECT LOGIC (unchanged)
+      if (role === "admin") {
+        navigate("/admin-dashboard");
+      } else if (role === "ngo") {
+        navigate("/ngo-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert("Server error. Try again later.");
+    } finally {
+      setLoading(false);
     }
-
-    const role = data.user.role;
-
-    // 🔥 Redirect based on role
-    if (role === "admin") {
-      navigate("/admin-dashboard");
-    } 
-    else {
-      navigate("/dashboard");
-    }
-
-  } catch (error) {
-    console.error(error);
-    alert("Server error. Try again later.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="auth-wrapper">
       <div className="auth-container">
+        
         {/* LEFT */}
         <div className="left-section">
           <div>
@@ -103,6 +124,7 @@ const handleLogin = async (e) => {
                 </span>
               </p>
             </div>
+
           </div>
         </div>
       </div>

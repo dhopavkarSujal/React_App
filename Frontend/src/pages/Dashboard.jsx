@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { supabase } from "../config/supabaseClient";
+
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 import StatsCards from "../components/StatsCards";
@@ -21,65 +23,89 @@ const DashboardHome = ({ donations }) => (
 );
 
 const Dashboard = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+
   const [activePage, setActivePage] = useState("dashboard");
   const [showModal, setShowModal] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
+
   const [user, setUser] = useState(null);
   const [donations, setDonations] = useState([]);
   const [notifications, setNotifications] = useState([]);
-useEffect(() => {
-  fetch("http://localhost:5000/api/auth/check", {
-    credentials: "include",
-  })
-    .then((res) => {
-      if (!res.ok) {
+
+  // 🔐 CHECK USER SESSION
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      const currentUser = data.session?.user;
+
+      if (!currentUser) {
         navigate("/login");
         return;
       }
-      return res.json();
-    })
-    .then((data) => {
-      if (data.user) {
-        setUser(data.user);
-      }
-    })
-    .catch(() => navigate("/login"));
-}, [navigate]);
 
-  useEffect(() => {
-  const fetchNotifications = () => {
-    fetch("http://localhost:5000/api/auth/notifications", {
-      credentials: "include",
-    })
-      .then(res => res.json())
-      .then(data => setNotifications(data))
-      .catch(err => console.error(err));
+      const { data: profile } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
+
+      setUser(profile);
+    };
+
+    checkUser();
+  }, [navigate]);
+
+  // 📦 FETCH DONATIONS
+  const fetchDonations = async (userId) => {
+    if (!userId) return;
+
+    const { data, error } = await supabase
+      .from("donations")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (!error) {
+      setDonations(data);
+    }
   };
 
-  fetchNotifications();
+  // 🔔 FETCH NOTIFICATIONS
+  const fetchNotifications = async (userId) => {
+    if (!userId) return;
 
-  const interval = setInterval(fetchNotifications, 5000); // every 5 sec
+    const { data, error } = await supabase
+      .from("notifications")
+      .select("*")
+      .eq("user_id", userId);
 
-  return () => clearInterval(interval);
-}, []);
+    if (!error) {
+      setNotifications(data);
+    }
+  };
 
+  // 🔁 LOAD DATA AFTER USER
   useEffect(() => {
-  fetch("http://localhost:5000/api/donations/my", {
-    credentials: "include",
-  })
-    .then(res => res.json())
-    .then(data => setDonations(data))
-    .catch(err => console.error(err));
-}, []);
-  /* ----------- Dark Mode ----------- */
+    if (user?.id) {
+      fetchDonations(user.id);
+      fetchNotifications(user.id);
+
+      const interval = setInterval(() => {
+        fetchNotifications(user.id);
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  // 🌙 DARK MODE
   useEffect(() => {
     document.body.classList.toggle("dark", darkMode);
   }, [darkMode]);
 
-  /* ----------- Sidebar Open Class ----------- */
+  // 📱 SIDEBAR
   useEffect(() => {
     document.body.classList.toggle("sidebar-open", sidebarOpen);
     return () => {
@@ -87,7 +113,7 @@ useEffect(() => {
     };
   }, [sidebarOpen]);
 
-  /* ----------- Swipe to Open Sidebar ----------- */
+  // 👉 SWIPE SIDEBAR
   useEffect(() => {
     let startX = 0;
 
@@ -111,7 +137,7 @@ useEffect(() => {
     };
   }, []);
 
-  /* ----------- Page Renderer ----------- */
+  // 📄 PAGE SWITCH
   const renderPage = () => {
     switch (activePage) {
       case "donations":
@@ -143,23 +169,22 @@ useEffect(() => {
         openNotifications={() => setShowNotif(true)}
         notifCount={notifications.length}
       />
+
       <main className="dashboard-body">
         {renderPage()}
       </main>
 
+      {/* ➕ ADD DONATION */}
       {showModal && (
-        <AddDonationModal 
+        <AddDonationModal
           onClose={() => {
             setShowModal(false);
-            fetch("/api/donations/my", {
-              credentials: "include",
-            })
-              .then(res => res.json())
-              .then(data => setDonations(data));
-          }} 
+            fetchDonations(user?.id);
+          }}
         />
       )}
 
+      {/* 🔔 NOTIFICATIONS */}
       {showNotif && (
         <NotificationModal
           onClose={() => setShowNotif(false)}
@@ -167,6 +192,7 @@ useEffect(() => {
         />
       )}
 
+      {/* OVERLAY */}
       {sidebarOpen && (
         <div
           className="overlay"

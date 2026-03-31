@@ -16,7 +16,7 @@ const Header = ({
 
         <h1 className="welcome-text">
           Welcome, <span className="username-highlight">
-            {username || "User"}
+            {username ? username : "User"}
           </span>
         </h1>
       </div>
@@ -26,10 +26,7 @@ const Header = ({
           <i className={`fas ${darkMode ? "fa-sun" : "fa-moon"}`}></i>
         </button>
 
-        <button
-          className="notif-btn btns"
-          onClick={openNotifications}
-        >
+        <button className="notif-btn btns" onClick={openNotifications}>
           <i className="fas fa-bell"></i>
           {notifCount > 0 && (
             <span className="notif-count">{notifCount}</span>
