@@ -5,6 +5,7 @@ import "../css/index.css";
 function Index() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const year = new Date().getFullYear();
 
   useEffect(() => {
     const sections = document.querySelectorAll("section");
@@ -53,18 +54,23 @@ function Index() {
   }, []);
 
   useEffect(() => {
-    const yearElement = document.getElementById("year");
-    if (yearElement) {
-      yearElement.textContent = new Date().getFullYear();
-    }
-  }, []);
+    const handleClick = (e) => {
+      if (!e.target.closest(".mobile-menu") && !e.target.closest(".hamburger")) {
+        setMenuOpen(false);
+      }
+    };
 
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, []);
   return (
     <main className="page-wrapper">
       {/* NAVBAR */}
       <header className="top-navbar">
         <div className="nav-inner">
-          <img src="img/logo1.png" alt="ServeShare Hero" width="140" />
+          <div className="logo">
+            <img src="img/logo1.png" alt="ServeShare" />
+          </div>
 
           <nav className="desktop-nav">
             <a href="#home">Home</a>
@@ -90,24 +96,16 @@ function Index() {
         </div>
 
         <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
-          <a onClick={() => setMenuOpen(false)} href="#home">
-            Home
-          </a>
-          <a onClick={() => setMenuOpen(false)} href="#donation">
-            Donations
-          </a>
-          <a onClick={() => setMenuOpen(false)} href="#about">
-            About
-          </a>
-          <a onClick={() => setMenuOpen(false)} href="#team">
-            Team
-          </a>
+          <a className="menu-link" onClick={() => setMenuOpen(false)} href="#home">Home</a>
+          <a className="menu-link" onClick={() => setMenuOpen(false)} href="#donation">Donations</a>
+          <a className="menu-link" onClick={() => setMenuOpen(false)} href="#about">About</a>
+          <a className="menu-link" onClick={() => setMenuOpen(false)} href="#team">Team</a>
         </div>
       </header>
 
       {/* HOME */}
       <section className="home-sec" id="home">
-        <div className="section-inner home-content">
+        <div className="section-inner home-content mobile-stack">
           <div className="home-info fade-left">
             <h1>Alone we can do little, together we can do so much</h1>
             <h2>
@@ -117,12 +115,14 @@ function Index() {
               From food and clothes to funds and stationery — ServeShare ensures donations
               reach verified NGOs and make real impact.
             </p>
-            <button className="custom-btn btn1" onClick={() => navigate("/login")}>
-              Donate Now
-            </button>
-            <button className="custom-btn btn2" onClick={() => navigate("/register-ngo")}>
-              Register NGO
-            </button>
+            <div className="btn-group">
+              <button className="custom-btn btn1" onClick={() => navigate("/login")}>
+                Donate Now
+              </button>
+              <button className="custom-btn btn2" onClick={() => navigate("/register-ngo")}>
+                Register NGO
+              </button>
+            </div>
           </div>
 
           <div className="img-sec zoom-in">
@@ -301,7 +301,7 @@ function Index() {
 
         <hr />
         <p className="copyright">
-          © <span id="year"></span> ServeShare | All Rights Reserved
+          © {year} ServeShare | All Rights Reserved
         </p>
       </footer>
     </main>

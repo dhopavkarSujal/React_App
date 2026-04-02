@@ -82,36 +82,36 @@ function Register() {
 
             <form onSubmit={handleRegister}>
               <div className="form-group">
-                <label>Full Name</label>
                 <input
                   type="text"
-                  placeholder="Enter Full Name"
+                  placeholder=" "
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
                 />
+                <label>Full Name</label>
               </div>
 
               <div className="form-group">
-                <label>Email</label>
                 <input
                   type="email"
-                  placeholder="Enter Email"
+                  placeholder=" "
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
+                <label>Email</label>
               </div>
 
               <div className="form-group">
-                <label>Password</label>
                 <input
                   type="password"
-                  placeholder="Enter Password"
+                  placeholder=" "
                   value={pass}
                   onChange={(e) => setPass(e.target.value)}
                   required
                 />
+                <label>Password</label>
               </div>
 
               <button type="submit" className="btn" disabled={loading}>

@@ -1,197 +1,277 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
-
-/* Global reset only for auth pages */
+/*GLOBAL RESET*/
 .auth-wrapper * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.25s ease;
 }
 
-/* Wrapper covers full height */
+/*APP BACKGROUND*/
 .auth-wrapper {
-    width: 100%;
-    min-height: 100vh;
-    background-color: #e6edff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-main);
 }
 
-/* Layout Container */
-.auth-wrapper .auth-container {
-    width: 100%;
+/*MAIN CONTAINER (APP STYLE FULL SCREEN)*/
+.auth-container {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-main);
+}
+
+/*TOP HEADER (APP BANNER)*/
+.left-section {
+  background: var(--main);
+  color: #fff;
+  padding: 45px 20px 80px;
+  text-align: center;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  animation: fadeIn 0.6s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/*HEADER TITLE*/
+.left-section h1 {
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+}
+
+/*HEADER SUBTEXT*/
+.left-section p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/*FORM CARD (FLOATING OVER HEADER)*/
+.right-section {
+  background: var(--bg-card);
+  margin: -50px 16px 0;
+  padding: 25px 20px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-soft);
+  animation: slideUp 0.5s ease;
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/*FORM BOX*/
+.form-box {
+  width: 100%;
+  height: fit-content;
+}
+
+/*FORM TITLE*/
+.form-box h2 {
+  text-align: center;
+  color: var(--main);
+  font-size: 1.8rem;
+  margin-bottom: 50px;
+}
+
+/*INPUT GROUP (IMPORTANT)*/
+.form-group {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+/*INPUT FIELD*/
+.form-group input {
+  width: 100%;
+  padding: 16px 14px; /* extra top space for label */
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #f9fafb;
+  font-size: 14px;
+  outline: none;
+}
+
+/*LABEL (DEFAULT CENTER)*/
+.form-group label {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--text-light);
+  pointer-events: none;
+  transition: 0.25s ease;
+}
+
+/*FLOATING LABEL*/
+.form-group input:focus + label,
+.form-group input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 10px;
+  font-size: 12px;
+  color: var(--secondary);
+  background: #fff;
+  padding: 0 6px;
+}
+
+/*INPUT FOCUS EFFECT*/
+.form-group input:focus {
+  border-color: var(--secondary);
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(78,205,196,0.2);
+}
+/*PRIMARY BUTTON*/
+.btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transform: scale(1);
+}
+
+/*BUTTON HOVER*/
+.btn:hover {
+  background: var(--main);
+  transform: scale(1.02);
+}
+.btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+}
+/*DIVIDER*/
+.divider {
+  text-align: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+/*DIVIDER LINES*/
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: #ddd;
+}
+
+/*LEFT LINE*/
+.divider::before {
+  left: 0;
+}
+
+/*RIGHT LINE*/
+.divider::after {
+  right: 0;
+}
+
+/*DIVIDER TEXT*/
+.divider span {
+  background: #fff;
+  padding: 0 10px;
+  font-size: 13px;
+  color: #777;
+}
+
+/*SOCIAL BUTTONS*/
+.social-login {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  transform: translateY(-3px) scale(1.05);
+  background: #e2e8f0;
+}
+
+/*SOCIAL ICON BOX*/
+.social-login div {
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/*FOOTER TEXT*/
+.auth-footer {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+/*FOOTER LINK*/
+.auth-footer span {
+  color: var(--secondary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/*FOOTER HOVER*/
+.auth-footer span:hover {
+  text-decoration: underline;
+}
+
+/*TABLET (STILL MOBILE STYLE, JUST SPACING IMPROVE)*/
+@media (min-width: 768px) {
+  .right-section {
+    margin: -60px auto 0;
+    max-width: 500px;
+  }
+}
+
+/*DESKTOP (SPLIT SCREEN LIKE ORIGINAL BUT MODERN)*/
+@media (min-width: 1024px) {
+
+  /*MAIN CONTAINER (CARD STYLE)*/
+  .auth-container {
     max-width: 1000px;
-    min-height: 550px;
-    background: #fff;
+    margin: 40px auto;
     display: flex;
-    border-radius: 12px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-    transition: 0.3s ease;
-}
+    box-shadow: var(--shadow-soft);
+    background: var(--bg-card);
+  }
 
-/* LEFT PANEL */
-.auth-wrapper .left-section {
+  /*LEFT PANEL (SIDE SECTION)*/
+  .left-section {
     flex: 1;
-    background-color: #303054;
-    color: #fff;
-    padding: 50px 35px;
-    display: flex;
+    border-radius: 0;
+    padding: 50px 30px;
     justify-content: center;
-    align-items: center;
-    text-align: center;
-}
+    display: flex;
+    flex-direction: column;
+  }
 
-.auth-wrapper .left-section h1 {
-    font-size: 2.2rem;
-    margin-bottom: 15px;
-}
-
-.auth-wrapper .left-section p {
-    font-size: 1rem;
-    opacity: 0.8;
-}
-
-/* RIGHT PANEL (form area) */
-.auth-wrapper .right-section {
+  /*RIGHT PANEL*/
+  .right-section {
     flex: 1;
-    padding: 40px 35px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.auth-wrapper .form-box {
-    width: 100%;
-    max-width: 380px;
-}
-
-.auth-wrapper .form-box h2 {
-    margin-bottom: 25px;
-    font-size: 1.8rem;
-    color: #303054;
-    text-align: center;
-}
-
-/* Input Fields */
-.auth-wrapper .form-group {
-    margin-bottom: 15px;
-}
-
-.auth-wrapper .form-group label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #303054;
-}
-
-.auth-wrapper .form-group input {
-    width: 100%;
-    padding: 12px;
-    border: 1.5px solid #ccc;
-    border-radius: 6px;
-    font-size: 15px;
-    outline: none;
-    transition: 0.3s;
-}
-
-.auth-wrapper .form-group input:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 8px rgba(102,126,234,0.4);
-}
-
-/* Buttons */
-.auth-wrapper .btn {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    background-color: #303054;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.auth-wrapper .btn:hover {
-    background-color: #e6edff;
-    color: #303054;
-    border: 1.5px solid #303054;
-}
-
-/* Footer Links */
-.auth-wrapper .auth-footer {
-    text-align: center;
-    margin-top: 20px;
-    color: #303054;
-    font-size: 14px;
-}
-
-.auth-wrapper .auth-footer span {
-    color: #0056b3;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.auth-wrapper .auth-footer span:hover {
-    text-decoration: underline;
-}
-
-/* =======================================================================
-   RESPONSIVE — TABLETS
-   ======================================================================= */
-@media (max-width: 900px) {
-    .auth-wrapper .auth-container {
-        flex-direction: column;
-        max-width: 500px;
-    }
-
-    .auth-wrapper .left-section {
-        height: 200px;
-        padding: 20px;
-    }
-
-    .auth-wrapper .right-section {
-        padding: 30px 20px;
-    }
-
-    .auth-wrapper .left-section h1 {
-        font-size: 1.6rem;
-    }
-
-    .auth-wrapper .left-section p {
-        font-size: 0.9rem;
-    }
-}
-
-/* =======================================================================
-   RESPONSIVE — PHONES
-   ======================================================================= */
-@media (max-width: 600px) {
-    .auth-wrapper {
-        padding: 10px;
-    }
-
-    .auth-wrapper .auth-container {
-        border-radius: 8px;
-    }
-
-    .auth-wrapper .left-section {
-        display: none; /* Hide image/text section for small screens */
-    }
-
-    .auth-wrapper .right-section {
-        padding: 25px 15px;
-    }
-
-    .auth-wrapper .form-box h2 {
-        font-size: 1.5rem;
-    }
-
-    .auth-wrapper .btn {
-        padding: 10px;
-        font-size: 0.95rem;
-    }
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 40px 30px;
+  }
 }
