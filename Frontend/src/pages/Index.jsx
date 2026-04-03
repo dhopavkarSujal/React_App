@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaFacebookF, FaInstagram, FaTwitter, FaLinkedinIn, FaGithub } from "react-icons/fa";
 import "../css/index.css";
 
 function Index() {
@@ -80,44 +81,48 @@ function Index() {
     <main className="page-wrapper">
       {/* NAVBAR */}
       <header className="top-navbar">
-        <div className="nav-inner">
-          <div className="logo">
-            <img src="img/logo1.png" alt="ServeShare" />
-          </div>
-
-          <nav className="desktop-nav">
-            <a href="#home">Home</a>
-            <a href="#donation">Donations</a>
-            <a href="#about">About</a>
-            <a href="#team">Team</a>
-          </nav>
-
-          <div
-            className={`hamburger ${menuOpen ? "active" : ""}`}
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") setMenuOpen(!menuOpen);
-            }}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
+      <div className="nav-inner">
+        <div className="logo">
+          <img src="img/logo1.png" alt="ServeShare" />
         </div>
 
-        <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
-          <a className="menu-link" onClick={() => setMenuOpen(false)} href="#home">Home</a>
-          <a className="menu-link" onClick={() => setMenuOpen(false)} href="#donation">Donations</a>
-          <a className="menu-link" onClick={() => setMenuOpen(false)} href="#about">About</a>
-          <a className="menu-link" onClick={() => setMenuOpen(false)} href="#team">Team</a>
+        <nav className="desktop-nav">
+          <a href="#home">Home</a>
+          <a href="#donation">Donations</a>
+          <a href="#about">About</a>
+          <a href="#team">Team</a>
+        </nav>
+
+        <div
+          className={`hamburger ${menuOpen ? "active" : ""}`}
+          onClick={() => setMenuOpen(prev => !prev)}
+          role="button"
+          tabIndex={0}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
-      </header>
+      </div>
+
+      {/* MOBILE MENU */}
+      <div
+        className={`menu-overlay ${menuOpen ? "show" : ""}`}
+        onClick={() => setMenuOpen(false)}
+      />
+      <div
+        className={`mobile-menu ${menuOpen ? "open" : ""}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <a className="menu-link" href="#home">Home</a>
+        <a className="menu-link" href="#donation">Donations</a>
+        <a className="menu-link" href="#about">About</a>
+        <a className="menu-link" href="#team">Team</a>
+      </div>
+    </header>
 
       {/* HOME */}
-      <section className="home-sec" id="home">
+      <section className="home-sec sec" id="home">
         <div className="section-inner home-content mobile-stack">
           <div className="home-info fade-left">
             <h1>Alone we can do little, together we can do so much</h1>
@@ -150,7 +155,7 @@ function Index() {
       <section className="don-sec" id="donation">
         <div className="container">
           <div className="heading text-center mb-5 fade-right">
-            <h2>We Manage Donations</h2>
+            <h2 className="headings">We Manage Donations</h2>
           </div>
 
           <div className="donation-row">
@@ -186,15 +191,13 @@ function Index() {
       <div className="soft-shadow-divider"></div>
       <section className="about-sec" id="about">
         <div className="section-inner about-grid">
-          <h2 className="about-heading">About Us</h2>
+          <h2 className="headings">About US</h2>
 
           <div className="about-img fade-left">
             <img src="img/img-2.jpeg" alt="About ServeShare" />
           </div>
 
           <div className="about-text fade-right">
-            <h3>What We Do & Why It Matters</h3>
-
             <p>
               ServeShare connects donors with <span className="highlight">verified NGOs</span>,
               ensuring transparency and trust.
@@ -220,17 +223,17 @@ function Index() {
       <div className="soft-shadow-divider"></div>
       <section className="team-sec" id="team">
         <div className="section-inner">
-          <h2 className="heading-left fade-left">Meet Our Team</h2>
+          <h2 className="headings heading-left fade-left">Meet Our Team</h2>
 
           <div className="team-grid">
             <div className="team-card fade-up">
               <img src="img/Sujal.jpeg" alt="Sujal" />
               <h4>Sujal Dhopavkar</h4>
               <p>Founder & CEO</p>
-              <div className="team-social">
-                <a href="#"><i className="fa-brands fa-linkedin-in"></i></a>
-                <a href="#"><i className="fa-brands fa-instagram"></i></a>
-                <a href="#"><i className="fa-brands fa-github"></i></a>
+                <div className="team-social">
+                  <a href="#"><FaLinkedinIn /></a>  
+                  <a href="#"><FaInstagram /></a>
+                  <a href="#"><FaGithub /></a>
               </div>
             </div>
 
@@ -239,9 +242,9 @@ function Index() {
               <h4>Bhumika Chavan</h4>
               <p>Operations Head</p>
               <div className="team-social">
-                <a href="#"><i className="fa-brands fa-linkedin-in"></i></a>
-                <a href="#"><i className="fa-brands fa-instagram"></i></a>
-                <a href="#"><i className="fa-brands fa-github"></i></a>
+                <a href="#"><FaLinkedinIn /></a>  
+                <a href="#"><FaInstagram /></a>
+                <a href="#"><FaGithub /></a>
               </div>
             </div>
 
@@ -250,9 +253,9 @@ function Index() {
               <h4>Suyash Gawade</h4>
               <p>Donor Relations</p>
               <div className="team-social">
-                <a href="#"><i className="fa-brands fa-linkedin-in"></i></a>
-                <a href="#"><i className="fa-brands fa-instagram"></i></a>
-                <a href="#"><i className="fa-brands fa-github"></i></a>
+                <a href="#"><FaLinkedinIn /></a>  
+                <a href="#"><FaInstagram /></a>
+                <a href="#"><FaGithub /></a>
               </div>
             </div>
 
@@ -261,9 +264,9 @@ function Index() {
               <h4>Shubham Kene</h4>
               <p>Logistics Manager</p>
               <div className="team-social">
-                <a href="#"><i className="fa-brands fa-linkedin-in"></i></a>
-                <a href="#"><i className="fa-brands fa-instagram"></i></a>
-                <a href="#"><i className="fa-brands fa-github"></i></a>
+                <a href="#"><FaLinkedinIn /></a>  
+                <a href="#"><FaInstagram /></a>
+                <a href="#"><FaGithub /></a>
               </div>
             </div>
           </div>
@@ -300,13 +303,13 @@ function Index() {
           <div className="col">
             <h4>Connect With Us</h4>
             <div className="social-icons">
-              <a href="#"><i className="fab fa-facebook-f"></i></a>
-              <a href="#"><i className="fab fa-instagram"></i></a>
-              <a href="#"><i className="fab fa-twitter"></i></a>
-              <a href="#"><i className="fab fa-linkedin"></i></a>
+              <a href="#"><FaFacebookF /></a>
+              <a href="#"><FaInstagram /></a>
+              <a href="#"><FaTwitter /></a>
+              <a href="#"><FaLinkedinIn /></a>
             </div>
             <form className="newsletter" onSubmit={(e) => e.preventDefault()}>
-              <input type="email" placeholder="Subscribe to newsletter" />
+              <input type="email" placeholder="Subscribe to ServeShare" />
               <button className="btn1">Subscribe</button>
             </form>
           </div>

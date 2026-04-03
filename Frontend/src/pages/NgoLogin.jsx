@@ -9,8 +9,6 @@ function NgoLogin() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-
-  // 🔄 Auto redirect if already logged in
   useEffect(() => {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
@@ -63,44 +61,67 @@ function NgoLogin() {
   };
 
   return (
-    <div className="ngo-login-wrapper">
-      <div className="ngo-login-card">
-        <h2>NGO Login</h2>
+    <>
+      <header className="top-navbar">
+        <div className="nav-inner">
+          <div className="logo">
+            <img src="img/logo1.png" alt="ServeShare" />
+          </div>
+        </div>
+      </header>
 
-        <form onSubmit={handleLogin}>
-          <div className="ngo-field">
-            <label>Email</label>
-            <input
-              type="email"
-              placeholder="Enter email"
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+      <div className="ngo-login-wrapper">
+        <div className="ngo-login-container">
+          {/* Header Section */}
+          <div className="ngo-header">
+            <h1>ServeShare</h1>
+            <p>NGO Login Portal</p>
           </div>
 
-          <div className="ngo-field">
-            <label>Password</label>
-            <input
-              type="password"
-              placeholder="Enter password"
-              onChange={(e) => setPass(e.target.value)}
-              required
-            />
+          {/* Form Card */}
+          <div className="ngo-login-card">
+            <div className="ngo-form-box">
+              <h2>NGO Login</h2>
+
+              <form onSubmit={handleLogin}>
+                <div className="ngo-field">
+                  <input
+                    type="email"
+                    placeholder=" "
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <label>Email Address</label>
+                </div>
+
+                <div className="ngo-field">
+                  <input
+                    type="password"
+                    placeholder=" "
+                    value={pass}
+                    onChange={(e) => setPass(e.target.value)}
+                    required
+                  />
+                  <label>Password</label>
+                </div>
+
+                <button className="ngo-btn" type="submit" disabled={loading}>
+                  {loading ? "Logging in..." : "Login"}
+                </button>
+              </form>
+
+              <div className="ngo-footer">
+                Don't have an account?
+                <span onClick={() => navigate("/register-ngo")}>
+                  Register NGO
+                </span>
+              </div>
+            </div>
           </div>
-
-          <button type="submit" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
-          </button>
-
-          <p>
-            Don’t have an account?
-            <span onClick={() => navigate("/register-ngo")}>
-              Register NGO
-            </span>
-          </p>
-        </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

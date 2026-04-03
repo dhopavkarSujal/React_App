@@ -6,19 +6,11 @@ import "../css/ngoRegister.css";
 function NgoRegister() {
   const navigate = useNavigate();
 
+  // ✅ Only required fields
   const [form, setForm] = useState({
     ngo_name: "",
     email: "",
     password: "",
-    registration_number: "",
-    established_year: "",
-    city: "",
-    state: "",
-    pincode: "",
-    donation_type: "",
-    service_radius_km: "",
-    contact: "",
-    summary: ""
   });
 
   const [loading, setLoading] = useState(false);
@@ -40,6 +32,7 @@ function NgoRegister() {
 
       if (error) {
         alert(error.message);
+        setLoading(false);
         return;
       }
 
@@ -47,10 +40,11 @@ function NgoRegister() {
 
       if (!user) {
         alert("Check your email for confirmation.");
+        setLoading(false);
         return;
       }
 
-      // 📦 Insert NGO data into ngos table
+      // ✅ Insert minimal NGO data
       const { error: ngoError } = await supabase
         .from("ngos")
         .insert([
@@ -58,26 +52,18 @@ function NgoRegister() {
             id: user.id,
             name: form.ngo_name,
             email: form.email,
-            registration_number: form.registration_number,
-            established_year: form.established_year,
-            city: form.city,
-            state: form.state,
-            pincode: form.pincode,
-            category: form.donation_type,
-            service_radius_km: form.service_radius_km,
-            phone: form.contact,
-            description: form.summary,
-            status: "pending",
+            status: "incomplete",
           },
         ]);
 
       if (ngoError) {
         console.error(ngoError);
         alert("NGO data not saved");
+        setLoading(false);
         return;
       }
 
-      // 📦 Insert role in users table
+      // ✅ Insert role in users table
       await supabase.from("users").insert([
         {
           id: user.id,
@@ -87,7 +73,7 @@ function NgoRegister() {
         },
       ]);
 
-      alert("NGO Registered Successfully. Waiting for approval.");
+      alert("NGO Registered Successfully. Please login to complete profile.");
       navigate("/ngo-login");
 
     } catch (err) {
@@ -99,40 +85,93 @@ function NgoRegister() {
   };
 
   return (
-    <div className="auth-wrapper">
-      <div className="authcontainer">
-        <div className="ngo-form-box">
-          <h2>NGO Registration</h2>
+    <>
+      <header className="top-navbar">
+        <div className="nav-inner">
+          <div className="logo">
+            <img src="img/logo1.png" alt="ServeShare" />
+          </div>
+        </div>
+      </header>
 
-          <form onSubmit={handleSubmit}>
-            <input name="ngo_name" placeholder="NGO Name" onChange={handleChange} required />
-            <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
-            <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
+      <div className="ngo-register-wrapper">
+        <div className="ngo-register-container">
+          {/* Header Section */}
+          <div className="ngo-header">
+            <h1>ServeShare</h1>
+            <p>NGO Registration Portal</p>
+          </div>
 
-            <input name="registration_number" placeholder="Registration Number" onChange={handleChange} />
-            <input name="established_year" placeholder="Established Year" onChange={handleChange} />
-            <input name="city" placeholder="City" onChange={handleChange} />
-            <input name="state" placeholder="State" onChange={handleChange} />
-            <input name="pincode" placeholder="Pincode" onChange={handleChange} />
-            <input name="donation_type" placeholder="Donation Types" onChange={handleChange} />
-            <input name="service_radius_km" placeholder="Service Radius (KM)" onChange={handleChange} />
-            <input name="contact" placeholder="Phone" onChange={handleChange} />
-            <textarea name="summary" placeholder="About NGO" onChange={handleChange} />
+          {/* Form Card */}
+          <div className="ngo-register-card">
+            <div className="ngo-form-box">
+              <h2>NGO Registration</h2>
 
-            <button type="submit" disabled={loading}>
-              {loading ? "Registering..." : "Register NGO"}
-            </button>
+              <form onSubmit={handleSubmit}>
+                <div className="ngo-form-grid">
 
-            <p>
-              Already registered?
-              <button type="button" onClick={() => navigate("/ngo-login")}>
-                NGO Login
-              </button>
-            </p>
-          </form>
+                  {/* NGO Name */}
+                  <div className="ngo-field">
+                    <input 
+                      name="ngo_name" 
+                      placeholder=" " 
+                      value={form.ngo_name}
+                      onChange={handleChange} 
+                      required 
+                    />
+                    <label>NGO Name</label>
+                  </div>
+
+                  {/* Email */}
+                  <div className="ngo-field">
+                    <input 
+                      type="email" 
+                      name="email" 
+                      placeholder=" " 
+                      value={form.email}
+                      onChange={handleChange} 
+                      required 
+                    />
+                    <label>Email Address</label>
+                  </div>
+
+                  {/* Password */}
+                  <div className="ngo-field">
+                    <input 
+                      type="password" 
+                      name="password" 
+                      placeholder=" " 
+                      value={form.password}
+                      onChange={handleChange} 
+                      required 
+                    />
+                    <label>Password</label>
+                  </div>
+
+                  {/* Button */}
+                  <button 
+                    className="ngo-btn" 
+                    type="submit" 
+                    disabled={loading}
+                    style={{ gridColumn: "span 1" }}
+                  >
+                    {loading ? "Registering..." : "Register NGO"}
+                  </button>
+
+                </div>
+              </form>
+
+              <div className="ngo-footer">
+                Already registered?
+                <span onClick={() => navigate("/ngo-login")}>
+                  NGO Login
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

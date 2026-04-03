@@ -1,114 +1,498 @@
-/* ===== WRAPPER ===== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+/* ===== NGO LOGIN VARIABLES ===== */
+:root {
+  --color-primary: #FF6B6B;        /* Coral (Main CTA) */
+  --color-primary-light: #FFE3E3;
+  --color-primary-dark: #E05555;
+
+  --color-secondary: #4ECDC4;      /* Teal (Trust) */
+  --color-secondary-light: #E0F7F5;
+  --color-secondary-dark: #3BB3AB;
+
+  --color-success: #FFE66D;        /* Yellow (Success) */
+  --color-success-light: #FFF9D6;
+  --color-success-dark: #E6CF5C;
+
+  /* =========================
+    🟣 PURPLE THEME (NEW)
+  ========================= */
+  --color-purple: #6C63FF;
+  --color-purple-light: #EAE9FF;
+  --color-purple-dark: #5148D9;
+
+  /* =========================
+    🌑 DARK MODE / ADMIN
+  ========================= */
+  --color-dark-bg: #1C1F33;
+  --color-dark-surface: #252A41;
+  --color-dark-hover: #303054;
+
+  /* =========================
+    🧠 TEXT SYSTEM
+  ========================= */
+  --color-text: #2C3E50;
+  --color-text-light: #6C757D;
+  --color-text-white: #FFFFFF;
+
+  /* =========================
+    🧱 BACKGROUND SYSTEM
+  ========================= */
+  --color-bg: #F8F9FA;
+  --color-white: #FFFFFF;
+  --color-border: #E5E7EB;
+
+  --bg-main: var(--color-bg);
+  --bg-card: var(--color-white);
+  --bg-hover: #F1F3F5;
+}
+
+/* ===== DEFAULT - MOBILE (320px - 480px) ===== */
+html {
+  font-size: 14px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  transition: var(--transition);
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* ===== TOP NAVBAR ===== */
+.top-navbar {
+  width: 100%;
+  height: 60px;
+  position: fixed;
+  top: 0;
+  background: var(--dark-bg);
+  color: #fff;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  z-index: 1000;
+}
+
+.nav-inner {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  flex-wrap: nowrap;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.logo img {
+  width: 100px;
+  height: auto;
+}
+
+/* WRAPPER & CONTAINER */
 .ngo-login-wrapper {
-  min-height: 100vh;
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  background: var(--bg-card);
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-  padding: 20px;
+  padding: 20px 10px;
 }
 
-/* ===== CARD ===== */
-.ngo-login-card {
+.ngo-login-container {
   width: 100%;
-  max-width: 420px;
-  background: white;
-  padding: 40px;
+  height: 100%;
+  background: var(--bg-card);
+  overflow: hidden;
+}
+
+/* HEADER SECTION */
+.ngo-header {
+  background: var(--ngo-primary);
+  color: #fff;
+  padding: 25px 16px 50px;
+  text-align: center;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.ngo-header h1 {
+  font-size: 1.25rem;
+  margin-bottom: 5px;
+}
+
+.ngo-header p {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+/* FORM CARD */
+.ngo-login-card {
+  background: var(--bg-card);
+  margin: -35px 10px 20px;
+  padding: 18px 14px;
   border-radius: 14px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-  animation: fadeUp 0.4s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.35s ease forwards;
+}
+
+.ngo-form-box {
+  width: 100%;
+  height: fit-content;
 }
 
 .ngo-login-card h2 {
   text-align: center;
-  margin-bottom: 30px;
-  color: #1b5e20;
-  font-size: 24px;
+  color: var(--ngo-primary);
+  font-size: 1.3rem;
+  margin-bottom: 25px;
 }
-
-/* ===== FORM ===== */
-.ngo-login-card form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+.ngo-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px !important;
 }
-
-/* ===== FIELD GROUP ===== */
+/* INPUT GROUP */
 .ngo-field {
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  margin-bottom: 15px;
 }
 
-.ngo-field label {
-  font-size: 13px;
-  margin-bottom: 6px;
-  color: #2e7d32;
-  font-weight: 500;
-}
-
-/* ===== INPUT ===== */
-.ngo-login-card input {
-  height: 44px;
-  padding: 0 14px;
-  border-radius: 8px;
-  border: 1px solid #d7e9da;
-  font-size: 14px;
-  background: #f9fdf9;
-  transition: 0.2s ease;
-}
-
-.ngo-login-card input:focus {
-  border-color: #2e7d32;
-  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+.ngo-field input {
+  width: 100%;
+  padding: 12px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: #f9fafb;
+  font-size: 0.9rem;
   outline: none;
 }
 
-/* ===== BUTTON ===== */
-.ngo-login-card button {
-  height: 44px;
-  border-radius: 8px;
+.ngo-field label {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  color: var(--text-light);
+  pointer-events: none;
+  transition: 0.25s ease;
+}
+
+.ngo-field input:focus + label,
+.ngo-field input:not(:placeholder-shown) + label {
+  top: -8px;
+  left: 8px;
+  font-size: 0.75rem;
+  color: var(--ngo-primary);
+  background: #fff;
+  padding: 0 6px;
+}
+
+.ngo-field input:focus {
+  border-color: var(--ngo-primary);
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
+}
+
+/* BUTTON */
+.ngo-btn {
+  width: 100%;
+  padding: 11px;
+  margin-top: 6px;
+  background: var(--ngo-primary);
+  color: #fff;
   border: none;
-  background: #2e7d32;
-  color: white;
+  border-radius: 10px;
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: 0.2s ease;
+  transform: scale(1);
 }
 
-.ngo-login-card button:hover {
-  background: #1b5e20;
+.ngo-btn:hover {
+  background: var(--ngo-primary-dark);
+  transform: scale(1.02);
 }
 
-.ngo-login-card button:active {
-  transform: scale(0.98);
+.ngo-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.15);
 }
 
-/* ===== BOTTOM TEXT ===== */
-.ngo-login-card p {
+/* BOTTOM TEXT */
+.ngo-footer {
   text-align: center;
-  font-size: 13px;
-  margin-top: 10px;
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: var(--text-light);
 }
 
-.ngo-login-card span {
-  color: #2e7d32;
+.ngo-footer span {
+  color: var(--ngo-primary);
   font-weight: 600;
   cursor: pointer;
   margin-left: 4px;
 }
 
-.ngo-login-card span:hover {
+.ngo-footer span:hover {
   text-decoration: underline;
 }
 
-/* ===== ANIMATION ===== */
-@keyframes fadeUp {
+/* ANIMATIONS */
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* ===== TABLET (481px - 767px) ===== */
+@media (min-width: 481px) and (max-width: 767px) {
+  html {
+    font-size: 15px;
+  }
+
+  .ngo-header {
+    padding: 30px 18px 55px;
+  }
+
+  .ngo-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .ngo-header p {
+    font-size: 0.8rem;
+  }
+
+  .ngo-login-card {
+    margin: -45px auto 0;
+    max-width: 95%;
+    padding: 20px 16px;
+  }
+
+  .ngo-login-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+  }
+
+  .ngo-field {
+    margin-bottom: 28px;
+  }
+
+  .ngo-field input {
+    padding: 13px 12px;
+    font-size: 0.95rem;
+  }
+
+  .ngo-field label {
+    font-size: 0.9rem;
+  }
+
+  .ngo-btn {
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+}
+
+/* ===== LARGER MOBILE (768px - 1023px) ===== */
+@media (min-width: 768px) and (max-width: 1023px) {
+  html {
+    font-size: 15px;
+  }
+
+  .ngo-header {
+    padding: 35px 25px 70px;
+  }
+
+  .ngo-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+
+  .ngo-header p {
+    font-size: 0.9rem;
+  }
+
+  .ngo-login-card {
+    margin: -60px auto 0;
+    max-width: 500px;
+    padding: 25px 20px;
+  }
+
+  .ngo-login-card h2 {
+    font-size: 1.7rem;
+    margin-bottom: 40px;
+  }
+
+  .ngo-field {
+    margin-bottom: 35px;
+  }
+
+  .ngo-field input {
+    padding: 14px 12px;
+    font-size: 0.95rem;
+  }
+
+  .ngo-field label {
+    font-size: 0.9rem;
+  }
+
+  .ngo-btn {
+    padding: 13px;
+    font-size: 0.95rem;
+  }
+}
+
+/* ===== DESKTOP (1024px+) ===== */
+@media (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
+
+  .ngo-login-wrapper {
+    height: 100vh;
+  }
+
+  .ngo-login-container {
+    max-width: 800px;
+    max-height: 80vh;
+    width: 85%;
+    display: flex;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    background: var(--bg-card);
+    margin: 0 auto;
+  }
+
+  .ngo-header {
+    flex: 1;
+    border-radius: 0;
+    padding: 40px 25px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ngo-header h1 {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+  }
+
+  .ngo-header p {
+    font-size: 0.8rem;
+  }
+
+  .ngo-login-card {
+    flex: 1;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 30px 25px;
+  }
+
+  .ngo-form-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .ngo-login-card h2 {
+    font-size: 1.4rem;
+    margin-bottom: 25px;
+  }
+
+  .ngo-field {
+    position: relative;
+    margin-bottom: 15px;
+  }
+
+  .ngo-field input {
+    width: 100%;
+    padding: 14px 14px;
+    font-size: 0.95rem;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: #f9fafb;
+    outline: none;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    min-height: 48px;
+  }
+
+  .ngo-field label {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    color: var(--text-light);
+    pointer-events: none;
+    transition: all 0.3s ease;
+  }
+
+  .ngo-field input:hover {
+    border-color: var(--ngo-primary);
+    background: #fafbfc;
+  }
+
+  .ngo-field input:focus {
+    border-color: var(--ngo-primary);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+  }
+
+  .ngo-field input:focus + label,
+  .ngo-field input:not(:placeholder-shown) + label {
+    top: -10px;
+    left: 12px;
+    font-size: 0.8rem;
+    color: var(--ngo-primary);
+    background: #fff;
+    padding: 0 6px;
+    font-weight: 500;
+  }
+
+  .ngo-btn {
+    padding: 14px 20px;
+    font-size: 0.95rem;
+    margin-top: 20px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .ngo-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
 }
